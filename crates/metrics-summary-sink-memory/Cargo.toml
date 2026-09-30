@@ -1,0 +1,21 @@
+[package]
+name = "metrics-summary-sink-memory"
+description = "Bounded, atomically published metric snapshot history"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation = "https://docs.rs/metrics-summary-sink-memory"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[dependencies]
+metrics-summary-core.workspace = true
+parking_lot.workspace = true
+
+[dev-dependencies]
+uuid.workspace = true

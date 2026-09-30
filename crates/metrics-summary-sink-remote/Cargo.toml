@@ -1,0 +1,35 @@
+[package]
+name = "metrics-summary-sink-remote"
+description = "Bounded HTTP and TCP transport for metrics summaries"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation = "https://docs.rs/metrics-summary-sink-remote"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = ["http"]
+http = ["dep:reqwest", "dep:url"]
+tcp = []
+[dependencies]
+metrics-summary-core.workspace = true
+metrics-summary-protocol.workspace = true
+reqwest = { workspace = true, optional = true }
+url = { workspace = true, optional = true }
+thiserror.workspace = true
+[lints]
+workspace = true
+[dev-dependencies]
+metrics-exporter-summary.workspace = true
+uuid.workspace = true
+
+[[example]]
+name = "remote"
+required-features = ["http"]

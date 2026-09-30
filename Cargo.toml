@@ -1,0 +1,51 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0-alpha"
+edition = "2021"
+rust-version = "1.95"
+license = "MIT OR Apache-2.0"
+authors = ["SF-Zhou <sfzhou.scut@gmail.com>"]
+homepage = "https://github.com/SF-Zhou/metrics-exporter-summary"
+repository = "https://github.com/SF-Zhou/metrics-exporter-summary"
+
+[workspace.dependencies]
+metrics-summary-core = { path = "crates/metrics-summary-core", version = "0.1.0-alpha" }
+metrics-exporter-summary = { path = "crates/metrics-exporter-summary", version = "0.1.0-alpha" }
+metrics-summary-sink-memory = { path = "crates/metrics-summary-sink-memory", version = "0.1.0-alpha" }
+metrics-summary-sink-clickhouse = { path = "crates/metrics-summary-sink-clickhouse", version = "0.1.0-alpha" }
+metrics-summary-protocol = { path = "crates/metrics-summary-protocol", version = "0.1.0-alpha" }
+metrics-summary-sink-remote = { path = "crates/metrics-summary-sink-remote", version = "0.1.0-alpha" }
+metrics-summary-collector = { path = "crates/metrics-summary-collector", version = "0.1.0-alpha" }
+metrics = "0.24.6"
+tdigest = "1.0.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+uuid = { version = "1.26.1", features = ["v4", "serde"] }
+hostname = "0.4.2"
+thiserror = "2.0.21"
+parking_lot = "0.12.5"
+crossbeam-channel = "0.5.17"
+reqwest = { version = "0.13.5", default-features = false, features = ["blocking", "rustls", "json", "query"] }
+rmp-serde = "1.3.1"
+serde_bytes = "0.11.19"
+tokio = { version = "1.53.1", features = ["rt-multi-thread", "net", "sync", "time", "signal", "macros", "io-util"] }
+axum = "0.8.9"
+bytes = "1.12.1"
+http = "1.5.0"
+url = "2.5.8"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
+clap = { version = "4.6.7", features = ["derive", "env"] }
+toml = "1.1.6"
+sha2 = "0.11.0"
+subtle = "2.6.1"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

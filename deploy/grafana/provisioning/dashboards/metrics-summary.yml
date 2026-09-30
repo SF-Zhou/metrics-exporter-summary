@@ -1,0 +1,12 @@
+apiVersion: 1
+providers:
+  - name: Metrics Summary
+    orgId: 1
+    folder: Metrics Summary
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards/metrics-summary
+      foldersFromFilesStructure: false

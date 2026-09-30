@@ -1,0 +1,82 @@
+name: Rust verification
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  workspace:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        rust: ["1.95.0", stable]
+    env:
+      RUST_TOOLCHAIN: ${{ matrix.rust }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --component rustfmt --component clippy
+      - name: Resolve dependencies for this job
+        run: cargo +"$RUST_TOOLCHAIN" generate-lockfile
+      - name: Format
+        if: matrix.rust == 'stable'
+        run: cargo +stable fmt --all -- --check
+      - name: Tests
+        run: cargo +"$RUST_TOOLCHAIN" test --workspace --all-features --locked
+      - name: Lints and examples
+        run: cargo +"$RUST_TOOLCHAIN" clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - name: Optional transport feature combinations
+        run: |
+          for package in metrics-summary-sink-remote metrics-summary-collector; do
+            cargo +"$RUST_TOOLCHAIN" test -p "$package" --locked
+            cargo +"$RUST_TOOLCHAIN" test -p "$package" --no-default-features --features tcp --locked
+            cargo +"$RUST_TOOLCHAIN" test -p "$package" --no-default-features --locked
+          done
+      - name: Documentation
+        env:
+          RUSTDOCFLAGS: -Dwarnings -Dmissing_docs
+        run: cargo +"$RUST_TOOLCHAIN" doc --workspace --all-features --no-deps --locked
+      - name: Verify publishable workspace archives
+        if: matrix.rust == 'stable'
+        run: cargo +stable package --workspace --all-features --locked --registry crates-io
+  docsrs:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install documentation toolchain
+        run: rustup toolchain install nightly --profile minimal
+      - name: Resolve dependencies for this job
+        run: cargo +nightly generate-lockfile
+      - name: Build docs.rs feature documentation
+        env:
+          RUSTDOCFLAGS: --cfg docsrs -Dwarnings -Dmissing_docs
+        run: cargo +nightly doc --workspace --all-features --no-deps --locked
+  clickhouse:
+    runs-on: ubuntu-24.04
+    services:
+      clickhouse:
+        image: clickhouse/clickhouse-server:26.8.6.5
+        env:
+          CLICKHOUSE_PASSWORD: integration-test-only
+          CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+        ports:
+          - 127.0.0.1:8123:8123
+        options: >-
+          --health-cmd "wget -qO- http://127.0.0.1:8123/ping || exit 1"
+          --health-interval 3s
+          --health-timeout 2s
+          --health-retries 30
+    env:
+      METRICS_CLICKHOUSE_URL: http://127.0.0.1:8123
+      METRICS_CLICKHOUSE_USER: default
+      METRICS_CLICKHOUSE_PASSWORD: integration-test-only
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: rustup toolchain install stable --profile minimal
+      - name: Resolve dependencies for this job
+        run: cargo +stable generate-lockfile
+      - name: Direct and regrouped insert semantics
+        run: cargo +stable test -p metrics-summary-sink-clickhouse --test real_clickhouse --locked -- --ignored
+      - name: Recorder through HTTP/TCP and both ACK boundaries
+        run: cargo +stable test -p metrics-summary-collector --all-features --test real_clickhouse --locked -- --ignored

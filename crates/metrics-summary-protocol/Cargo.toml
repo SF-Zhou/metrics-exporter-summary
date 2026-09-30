@@ -1,0 +1,23 @@
+[package]
+name = "metrics-summary-protocol"
+description = "Versioned, bounded MessagePack wire protocol for metrics summaries"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation = "https://docs.rs/metrics-summary-protocol"
+
+[package.metadata.docs.rs]
+all-features = true
+[dependencies]
+metrics-summary-core.workspace = true
+rmp-serde.workspace = true
+serde_bytes.workspace = true
+uuid.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+[lints]
+workspace = true

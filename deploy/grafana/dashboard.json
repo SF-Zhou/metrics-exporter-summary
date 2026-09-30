@@ -1,0 +1,675 @@
+{
+  "uid": "metrics-summary-v1",
+  "title": "Metrics summary \u2014 host summaries",
+  "description": "Metric summary counters/distributions with nine flat labels; adaptive, total-point-budgeted time buckets and observed gauge summaries.",
+  "tags": [
+    "metrics-summary",
+    "clickhouse"
+  ],
+  "timezone": "utc",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": false,
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "annotations": {
+    "list": []
+  },
+  "links": [],
+  "templating": {
+    "list": [
+      {
+        "name": "host",
+        "label": "Host",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "metrics-summary-clickhouse"
+        },
+        "query": {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT DISTINCT hex(host) AS value, host AS text FROM (\nSELECT host FROM metrics_summary.distributions WHERE $__timeFilter_ms(TIMESTAMP)\nUNION ALL\nSELECT host FROM metrics_summary.counters WHERE $__timeFilter_ms(TIMESTAMP)\n) ORDER BY host LIMIT 10000"
+        },
+        "definition": "SELECT DISTINCT hex(host) AS value, host AS text FROM (\nSELECT host FROM metrics_summary.distributions WHERE $__timeFilter_ms(TIMESTAMP)\nUNION ALL\nSELECT host FROM metrics_summary.counters WHERE $__timeFilter_ms(TIMESTAMP)\n) ORDER BY host LIMIT 10000",
+        "refresh": 2,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "options": [],
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "skipUrlSync": false
+      },
+      {
+        "name": "metric",
+        "label": "Distribution metric (ns)",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "metrics-summary-clickhouse"
+        },
+        "query": {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT DISTINCT hex(metricName) AS value, metricName AS text FROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\nORDER BY metricName LIMIT 10000"
+        },
+        "definition": "SELECT DISTINCT hex(metricName) AS value, metricName AS text FROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\nORDER BY metricName LIMIT 10000",
+        "refresh": 2,
+        "sort": 1,
+        "multi": false,
+        "includeAll": false,
+        "options": [],
+        "current": {},
+        "skipUrlSync": false
+      },
+      {
+        "name": "counter_metric",
+        "label": "Counter metric (increments)",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "metrics-summary-clickhouse"
+        },
+        "query": {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT DISTINCT hex(metricName) AS value, metricName AS text FROM metrics_summary.counters\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\nORDER BY metricName LIMIT 10000"
+        },
+        "definition": "SELECT DISTINCT hex(metricName) AS value, metricName AS text FROM metrics_summary.counters\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\nORDER BY metricName LIMIT 10000",
+        "refresh": 2,
+        "sort": 1,
+        "multi": false,
+        "includeAll": false,
+        "options": [],
+        "current": {},
+        "skipUrlSync": false
+      },
+      {
+        "name": "gauge_metric",
+        "label": "Gauge metric (current value)",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "metrics-summary-clickhouse"
+        },
+        "query": {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT DISTINCT hex(metricName) AS value, metricName AS text FROM metrics_summary.counters\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\nORDER BY metricName LIMIT 10000"
+        },
+        "definition": "SELECT DISTINCT hex(metricName) AS value, metricName AS text FROM metrics_summary.counters\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\nORDER BY metricName LIMIT 10000",
+        "refresh": 2,
+        "sort": 1,
+        "multi": false,
+        "includeAll": false,
+        "options": [],
+        "current": {},
+        "skipUrlSync": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "How to read these summaries",
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Choose a host and separate metric names for Counter increments and Gauge current values: both are stored in counters, without a type marker. Distribution panels assume nanosecond input. **Local-window p99 mean/worst are not a global percentile.** Counter rates are stored increments summed in adaptive buckets (at least 10 seconds) / actual bucket width; they are not per-collection rates. Timestamp precision is one second. Gauge panels show observed mean/range rather than an exact latest value. Repeated stored rows are counted; there is no storage deduplication or source-session identity.\n\nAll time-series panels retain the complete metric + nine-label identity and share a 50,000 numeric point budget per query. More selected series widen the buckets; Gauge mean/min/max count as three points. Queries fail explicitly if even one point per series would exceed the budget. Narrow filters for finer resolution."
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Exported histogram samples per bucket",
+      "description": "Sum of the count field in stored distribution rows; repeated inserts are counted again. Adaptive buckets retain all selected series within a 50,000 total numeric point budget (three values per Gauge series).",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "metrics-summary-clickhouse"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "timeseries",
+          "format": 0,
+          "rawSql": "WITH\n    50000 AS max_points,\n    1 AS value_columns,\n    toUnixTimestamp64Milli($__fromTime_ms) AS range_start_ms,\n    greatest(toInt64(0), toUnixTimestamp64Milli($__toTime_ms) - range_start_ms) AS range_span_ms,\n    (SELECT uniqExact(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io))\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])) AS series_count,\n    greatest(toUInt64(1), intDiv(max_points, greatest(series_count * value_columns, toUInt64(1)))) AS buckets_per_series,\n    greatest(toInt64(10), intDiv(toInt64($__interval_ms) + 999, 1000),\n             intDiv(range_span_ms, toInt64(buckets_per_series) * 1000) + 1)\n        + throwIf(series_count * value_columns > max_points,\n                  'Selected series exceed the 50000 point budget; narrow host, metric, or time filters') AS bucket_seconds\nSELECT fromUnixTimestamp64Milli(range_start_ms +\n       intDiv(toUnixTimestamp64Milli(toDateTime64(TIMESTAMP, 3)) - range_start_ms, bucket_seconds * 1000)\n       * bucket_seconds * 1000) AS time,\n       toJSONString(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io)) AS series,\n       sum(count) AS samples\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])\nGROUP BY time, metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io\nQUALIFY throwIf(count() OVER () * value_columns > max_points,\n                'Selected series changed during the query and exceed the point budget; narrow filters or retry') = 0\nORDER BY time, series"
+        }
+      ],
+      "interval": "1s",
+      "maxDataPoints": 1000,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "auto",
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Sample-weighted mean",
+      "description": "Weighted across stored distributions: sum(mean * count) / sum(count). Repeated inserts are included. Adaptive buckets retain all selected series within a 50,000 total numeric point budget (three values per Gauge series).",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "metrics-summary-clickhouse"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "timeseries",
+          "format": 0,
+          "rawSql": "WITH\n    50000 AS max_points,\n    1 AS value_columns,\n    toUnixTimestamp64Milli($__fromTime_ms) AS range_start_ms,\n    greatest(toInt64(0), toUnixTimestamp64Milli($__toTime_ms) - range_start_ms) AS range_span_ms,\n    (SELECT uniqExact(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io))\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])) AS series_count,\n    greatest(toUInt64(1), intDiv(max_points, greatest(series_count * value_columns, toUInt64(1)))) AS buckets_per_series,\n    greatest(toInt64(10), intDiv(toInt64($__interval_ms) + 999, 1000),\n             intDiv(range_span_ms, toInt64(buckets_per_series) * 1000) + 1)\n        + throwIf(series_count * value_columns > max_points,\n                  'Selected series exceed the 50000 point budget; narrow host, metric, or time filters') AS bucket_seconds\nSELECT fromUnixTimestamp64Milli(range_start_ms +\n       intDiv(toUnixTimestamp64Milli(toDateTime64(TIMESTAMP, 3)) - range_start_ms, bucket_seconds * 1000)\n       * bucket_seconds * 1000) AS time,\n       toJSONString(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io)) AS series,\n       sum(mean * count) / nullIf(sum(count), 0) AS weighted_mean\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])\nGROUP BY time, metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io\nQUALIFY throwIf(count() OVER () * value_columns > max_points,\n                'Selected series changed during the query and exceed the point budget; narrow filters or retry') = 0\nORDER BY time, series"
+        }
+      ],
+      "interval": "1s",
+      "maxDataPoints": 1000,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ns",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "auto",
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Mean local-window p99 (unweighted)",
+      "description": "Equal weight per exported series/window p99. This is not a global p99. Adaptive buckets retain all selected series within a 50,000 total numeric point budget (three values per Gauge series).",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "metrics-summary-clickhouse"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "timeseries",
+          "format": 0,
+          "rawSql": "WITH\n    50000 AS max_points,\n    1 AS value_columns,\n    toUnixTimestamp64Milli($__fromTime_ms) AS range_start_ms,\n    greatest(toInt64(0), toUnixTimestamp64Milli($__toTime_ms) - range_start_ms) AS range_span_ms,\n    (SELECT uniqExact(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io))\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])) AS series_count,\n    greatest(toUInt64(1), intDiv(max_points, greatest(series_count * value_columns, toUInt64(1)))) AS buckets_per_series,\n    greatest(toInt64(10), intDiv(toInt64($__interval_ms) + 999, 1000),\n             intDiv(range_span_ms, toInt64(buckets_per_series) * 1000) + 1)\n        + throwIf(series_count * value_columns > max_points,\n                  'Selected series exceed the 50000 point budget; narrow host, metric, or time filters') AS bucket_seconds\nSELECT fromUnixTimestamp64Milli(range_start_ms +\n       intDiv(toUnixTimestamp64Milli(toDateTime64(TIMESTAMP, 3)) - range_start_ms, bucket_seconds * 1000)\n       * bucket_seconds * 1000) AS time,\n       toJSONString(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io)) AS series,\n       avg(p99) AS mean_local_window_p99\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])\nGROUP BY time, metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io\nQUALIFY throwIf(count() OVER () * value_columns > max_points,\n                'Selected series changed during the query and exceed the point budget; narrow filters or retry') = 0\nORDER BY time, series"
+        }
+      ],
+      "interval": "1s",
+      "maxDataPoints": 1000,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ns",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "auto",
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Worst local-window p99",
+      "description": "Largest exported local p99 in the bucket, not a reconstructed percentile. Adaptive buckets retain all selected series within a 50,000 total numeric point budget (three values per Gauge series).",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "metrics-summary-clickhouse"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "timeseries",
+          "format": 0,
+          "rawSql": "WITH\n    50000 AS max_points,\n    1 AS value_columns,\n    toUnixTimestamp64Milli($__fromTime_ms) AS range_start_ms,\n    greatest(toInt64(0), toUnixTimestamp64Milli($__toTime_ms) - range_start_ms) AS range_span_ms,\n    (SELECT uniqExact(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io))\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])) AS series_count,\n    greatest(toUInt64(1), intDiv(max_points, greatest(series_count * value_columns, toUInt64(1)))) AS buckets_per_series,\n    greatest(toInt64(10), intDiv(toInt64($__interval_ms) + 999, 1000),\n             intDiv(range_span_ms, toInt64(buckets_per_series) * 1000) + 1)\n        + throwIf(series_count * value_columns > max_points,\n                  'Selected series exceed the 50000 point budget; narrow host, metric, or time filters') AS bucket_seconds\nSELECT fromUnixTimestamp64Milli(range_start_ms +\n       intDiv(toUnixTimestamp64Milli(toDateTime64(TIMESTAMP, 3)) - range_start_ms, bucket_seconds * 1000)\n       * bucket_seconds * 1000) AS time,\n       toJSONString(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io)) AS series,\n       max(p99) AS worst_local_window_p99\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])\nGROUP BY time, metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io\nQUALIFY throwIf(count() OVER () * value_columns > max_points,\n                'Selected series changed during the query and exceed the point budget; narrow filters or retry') = 0\nORDER BY time, series"
+        }
+      ],
+      "interval": "1s",
+      "maxDataPoints": 1000,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ns",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "auto",
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Observed maximum",
+      "description": "Largest original accepted observation across the selected exported summaries. Adaptive buckets retain all selected series within a 50,000 total numeric point budget (three values per Gauge series).",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "metrics-summary-clickhouse"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "timeseries",
+          "format": 0,
+          "rawSql": "WITH\n    50000 AS max_points,\n    1 AS value_columns,\n    toUnixTimestamp64Milli($__fromTime_ms) AS range_start_ms,\n    greatest(toInt64(0), toUnixTimestamp64Milli($__toTime_ms) - range_start_ms) AS range_span_ms,\n    (SELECT uniqExact(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io))\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])) AS series_count,\n    greatest(toUInt64(1), intDiv(max_points, greatest(series_count * value_columns, toUInt64(1)))) AS buckets_per_series,\n    greatest(toInt64(10), intDiv(toInt64($__interval_ms) + 999, 1000),\n             intDiv(range_span_ms, toInt64(buckets_per_series) * 1000) + 1)\n        + throwIf(series_count * value_columns > max_points,\n                  'Selected series exceed the 50000 point budget; narrow host, metric, or time filters') AS bucket_seconds\nSELECT fromUnixTimestamp64Milli(range_start_ms +\n       intDiv(toUnixTimestamp64Milli(toDateTime64(TIMESTAMP, 3)) - range_start_ms, bucket_seconds * 1000)\n       * bucket_seconds * 1000) AS time,\n       toJSONString(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io)) AS series,\n       max(max) AS observed_max\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])\nGROUP BY time, metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io\nQUALIFY throwIf(count() OVER () * value_columns > max_points,\n                'Selected series changed during the query and exceed the point budget; narrow filters or retry') = 0\nORDER BY time, series"
+        }
+      ],
+      "interval": "1s",
+      "maxDataPoints": 1000,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ns",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "auto",
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "Distribution observations and local p95",
+      "description": "Missing rows mean no exported observations, not a zero measurement.",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "metrics-summary-clickhouse"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io, count() AS stored_rows, sum(count) AS samples,\n       min(min) AS observed_min, max(max) AS observed_max,\n       avg(p95) AS mean_local_window_p95, max(p95) AS worst_local_window_p95,\n       max(TIMESTAMP) AS last_observed\nFROM metrics_summary.distributions\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${metric:sqlstring}])\nGROUP BY metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io\nORDER BY metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io"
+        }
+      ],
+      "interval": "1s",
+      "maxDataPoints": 1000,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Counter observed rate per adaptive bucket",
+      "description": "For Counter metric names only: sum of stored increments divided by the actual adaptive bucket width. Bucket width is at least 10s and the Grafana interval, and grows to keep all selected series within 50,000 total numeric points. Partial range-edge buckets may be incomplete; repeated writes increase the sum.",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "metrics-summary-clickhouse"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "timeseries",
+          "format": 0,
+          "rawSql": "WITH\n    50000 AS max_points,\n    1 AS value_columns,\n    toUnixTimestamp64Milli($__fromTime_ms) AS range_start_ms,\n    greatest(toInt64(0), toUnixTimestamp64Milli($__toTime_ms) - range_start_ms) AS range_span_ms,\n    (SELECT uniqExact(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io))\nFROM metrics_summary.counters\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${counter_metric:sqlstring}])) AS series_count,\n    greatest(toUInt64(1), intDiv(max_points, greatest(series_count * value_columns, toUInt64(1)))) AS buckets_per_series,\n    greatest(toInt64(10), intDiv(toInt64($__interval_ms) + 999, 1000),\n             intDiv(range_span_ms, toInt64(buckets_per_series) * 1000) + 1)\n        + throwIf(series_count * value_columns > max_points,\n                  'Selected series exceed the 50000 point budget; narrow host, metric, or time filters') AS bucket_seconds\nSELECT fromUnixTimestamp64Milli(range_start_ms +\n       intDiv(toUnixTimestamp64Milli(toDateTime64(TIMESTAMP, 3)) - range_start_ms, bucket_seconds * 1000)\n       * bucket_seconds * 1000) AS time,\n       toJSONString(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io)) AS series,\n       sum(toFloat64(val)) / toFloat64(bucket_seconds) AS observed_rate_per_second\nFROM metrics_summary.counters\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${counter_metric:sqlstring}])\nGROUP BY time, metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io\nQUALIFY throwIf(count() OVER () * value_columns > max_points,\n                'Selected series changed during the query and exceed the point budget; narrow filters or retry') = 0\nORDER BY time, series"
+        }
+      ],
+      "interval": "1s",
+      "maxDataPoints": 1000,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 0,
+            "fillOpacity": 0,
+            "showPoints": "always",
+            "spanNulls": false,
+            "pointSize": 5
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Gauge observed mean and range per bucket",
+      "description": "For Gauge metric names only. Aggregates stored snapshots in each bucket. Same-second values have no stored ordering, and no exact latest value is inferred. Adaptive buckets retain all selected series within a 50,000 total numeric point budget (three values per Gauge series).",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "metrics-summary-clickhouse"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "timeseries",
+          "format": 0,
+          "rawSql": "WITH\n    50000 AS max_points,\n    3 AS value_columns,\n    toUnixTimestamp64Milli($__fromTime_ms) AS range_start_ms,\n    greatest(toInt64(0), toUnixTimestamp64Milli($__toTime_ms) - range_start_ms) AS range_span_ms,\n    (SELECT uniqExact(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io))\nFROM metrics_summary.counters\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${gauge_metric:sqlstring}])) AS series_count,\n    greatest(toUInt64(1), intDiv(max_points, greatest(series_count * value_columns, toUInt64(1)))) AS buckets_per_series,\n    greatest(toInt64(10), intDiv(toInt64($__interval_ms) + 999, 1000),\n             intDiv(range_span_ms, toInt64(buckets_per_series) * 1000) + 1)\n        + throwIf(series_count * value_columns > max_points,\n                  'Selected series exceed the 50000 point budget; narrow host, metric, or time filters') AS bucket_seconds\nSELECT fromUnixTimestamp64Milli(range_start_ms +\n       intDiv(toUnixTimestamp64Milli(toDateTime64(TIMESTAMP, 3)) - range_start_ms, bucket_seconds * 1000)\n       * bucket_seconds * 1000) AS time,\n       toJSONString(tuple(metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io)) AS series,\n       avg(val) AS observed_mean, min(val) AS observed_min, max(val) AS observed_max\nFROM metrics_summary.counters\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${gauge_metric:sqlstring}])\nGROUP BY time, metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io\nQUALIFY throwIf(count() OVER () * value_columns > max_points,\n                'Selected series changed during the query and exceed the point budget; narrow filters or retry') = 0\nORDER BY time, series"
+        }
+      ],
+      "interval": "1s",
+      "maxDataPoints": 1000,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "auto",
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": "table",
+      "title": "Gauge observed range by labels",
+      "description": "Observed range over the selected period. last_observed indicates freshness, not a uniquely ordered latest value.",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "metrics-summary-clickhouse"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 44
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "metrics-summary-clickhouse"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.20.0",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io, count() AS stored_rows,\n       avg(val) AS observed_mean, min(val) AS observed_min, max(val) AS observed_max,\n       max(TIMESTAMP) AS last_observed\nFROM metrics_summary.counters\nWHERE $__timeFilter_ms(TIMESTAMP)\n  AND host IN arrayMap(value -> unhex(value), [${host:sqlstring}])\n  AND metricName IN arrayMap(value -> unhex(value), [${gauge_metric:sqlstring}])\nGROUP BY metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io\nORDER BY metricName, host, pod, instance, tag, thread, uid, statusCode, mount_name, io"
+        }
+      ],
+      "interval": "1s",
+      "maxDataPoints": 1000,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    }
+  ]
+}

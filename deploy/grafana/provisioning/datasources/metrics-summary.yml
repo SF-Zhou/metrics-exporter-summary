@@ -1,0 +1,30 @@
+apiVersion: 1
+datasources:
+  - name: Metrics Summary ClickHouse
+    uid: metrics-summary-clickhouse
+    type: grafana-clickhouse-datasource
+    access: proxy
+    isDefault: false
+    editable: false
+    version: 1
+    jsonData:
+      host: $GRAFANA_CLICKHOUSE_HOST
+      port: 8443
+      protocol: http
+      username: grafana_summary_reader
+      defaultDatabase: metrics_summary
+      secure: true
+      tlsSkipVerify: false
+      # For a private ClickHouse CA:
+      # tlsAuthWithCACert: true
+      dialTimeout: 5
+      queryTimeout: 30
+      maxOpenConns: 10
+      maxIdleConns: 5
+      connMaxLifetime: 5
+      enableMapKeysDiscovery: false
+      validateSql: true
+    secureJsonData:
+      # Use $VAR (not ${VAR}) so passwords containing $ are not expanded twice.
+      password: $GRAFANA_CLICKHOUSE_PASSWORD
+      # tlsCACert: $GRAFANA_CLICKHOUSE_CA_PEM

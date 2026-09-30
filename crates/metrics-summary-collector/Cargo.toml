@@ -1,0 +1,50 @@
+[package]
+name = "metrics-summary-collector"
+description = "Bounded metrics summary collector with HTTP and TCP ingestion"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation = "https://docs.rs/metrics-summary-collector"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = ["http"]
+http = ["dep:axum", "dep:hyper", "dep:hyper-util", "dep:tower"]
+tcp = []
+[dependencies]
+metrics-summary-core.workspace = true
+metrics-summary-protocol.workspace = true
+metrics-summary-sink-clickhouse.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+axum = { workspace = true, optional = true }
+hyper = { version = "1.11.1", features = ["server", "http1"], optional = true }
+hyper-util = { version = "0.1.21", features = ["tokio", "service"], optional = true }
+tower = { version = "0.5.3", optional = true }
+sha2.workspace = true
+subtle.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+toml.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+[dev-dependencies]
+metrics-exporter-summary.workspace = true
+metrics-summary-sink-remote = { workspace = true, features = ["tcp"] }
+uuid.workspace = true
+reqwest.workspace = true
+[lints]
+workspace = true
+
+[[bench]]
+name = "backend_capacity"
+harness = false
+required-features = ["http", "tcp"]

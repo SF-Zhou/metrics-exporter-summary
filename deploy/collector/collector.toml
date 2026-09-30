@@ -1,0 +1,47 @@
+# Direct HTTP deployment. Export METRICS_COLLECTOR_TOKEN and,
+# if required, CLICKHOUSE_PASSWORD through your secret manager.
+# Configure at least one listener explicitly; omitted listeners are disabled.
+# Bind a private IP or 127.0.0.1 instead when appropriate for your deployment.
+http_listen = "0.0.0.0:9091"
+# TCP requires cargo build --release --features tcp -p metrics-summary-collector.
+# For TCP only, remove http_listen and build with --no-default-features --features tcp.
+# tcp_listen = "0.0.0.0:9092"
+write_concurrency = 2
+shutdown_timeout_ms = 30000
+
+[collector]
+max_connections = 256
+max_requests = 128
+max_encoded_bytes = 8388608
+max_pending_batches = 1024
+max_pending_bytes = 134217728
+group_max_batches = 64
+group_max_rows = 100000
+group_max_bytes = 33554432
+group_max_encoded_bytes = 67108864
+group_max_delay_ms = 100
+request_timeout_ms = 30000
+db_write_timeout_ms = 10000
+retry_deadline_ms = 60000
+retry_max_attempts = 5
+retry_backoff_ms = 100
+dedup_capacity = 4096
+dedup_ttl_ms = 300000
+allow_enqueued = true
+allow_confirmed = true
+# Bind this listener's token to a single application if tenant isolation is required.
+# allowed_application = "orders"
+
+[collector.validation]
+# Label names are agreed by instrumentation, database columns and queries.
+# This count includes automatically supplied host and instance labels.
+max_labels = 32
+
+[clickhouse]
+# For a private ClickHouse HTTPS CA:
+# ca_file = "/etc/metrics-summary/clickhouse-ca.pem"
+endpoint = "http://127.0.0.1:8123"
+database = "metrics_summary"
+# username = "metrics_writer"
+async_insert = false
+connect_timeout_ms = 2000

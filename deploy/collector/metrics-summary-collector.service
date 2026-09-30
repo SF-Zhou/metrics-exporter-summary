@@ -1,0 +1,31 @@
+[Unit]
+Description=Metrics summary collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+ExecStart=/usr/local/bin/metrics-summary-collector --config /etc/metrics-summary/collector.toml
+# Install this root-owned file with mode 0600; it defines METRICS_COLLECTOR_TOKEN
+# and optionally CLICKHOUSE_PASSWORD. Do not put secrets in command-line flags.
+EnvironmentFile=/etc/metrics-summary/collector.env
+Restart=on-failure
+RestartSec=5
+# Must exceed collector.shutdown_timeout_ms plus service-manager overhead.
+TimeoutStopSec=40
+KillSignal=SIGTERM
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=yes
+LimitNOFILE=4096
+TasksMax=256
+
+[Install]
+WantedBy=multi-user.target
